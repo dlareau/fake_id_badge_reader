@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Pokemon Trainer Lookup</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+
+    <script>
+      trainers = {
+        "24811349": {
+          "name": "Morgan Fowler",
+          "dob": "05/22/1989",
+          "ptn": "248-11-349",
+          "gym": "Cerulean City Gym",
+          "ptype": "Water",
+          "badges": ["earth"],
+        },
+        "43148762": {
+          "name": "Avery Phelps",
+          "dob": "09/26/1990",
+          "ptn": "431-48-762",
+          "gym": "Vermillion City Gym",
+          "ptype": "Grass",
+          "badges": ["boulder", "cascade", "thunder"],
+        },
+        "36474933": {
+          "name": "Ashton Baxter",
+          "dob": "02/03/1993",
+          "ptn": "364-74-933",
+          "gym": "Fuchsia City Gym",
+          "ptype": "Electric",
+          "badges": ["rainbow", "marsh"],
+        },
+        "63971389": {
+          "name": "Taylor Ingram",
+          "dob": "07/16/1986",
+          "ptn": "639-71-389",
+          "gym": "Cinnabar Island Gym",
+          "ptype": "Psychic",
+          "badges": ["soul", "volcano", "boulder", "earth"],
+        },
+        "": {
+          "name": "",
+          "dob": "",
+          "ptn": "",
+          "gym": "",
+          "ptype": "",
+          "badges": [],
+        },
+      };
+
+      scan_list = [];
+      has_started_sequence = false;
+      correct_order = [
+        "36474933",
+        "24811349",
+        "63971389",
+        "43148762",
+
+        "63971389",
+        "43148762",
+        "36474933",
+        "24811349",
+        // Fix order after this point
+        "24811349",
+        "36474933",
+        "43148762",
+        "63971389"
+      ];
+
+      function show_trainer(trainer) {
+        $("#trainer_info").show()
+        $("#name").text(trainer["name"]);
+        $("#dob").text(trainer["dob"]);
+        $("#ptn").text(trainer["ptn"]);
+        $("#gym").text(trainer["gym"]);
+        $("#ptype").text(trainer["ptype"]);
+        $("#badges").html("");
+        for (var i = 0; i < trainer["badges"].length; i++) {
+          $("#badges").append("<div class='level-item pr-3'><figure class='image is-64x64'><img src='" + trainer["badges"][i] + "badge.webp'></figure></div>");
+        }
+        $("#trainer_img").attr("src", trainer["ptn"] + ".png");
+      }
+
+      function send_state(card, stage, finished) {
+        $.ajax({
+          url: "http://192.168.0.101:8123/api/states/input_text.id_card_last_scanned",
+          type: 'POST',
+          beforeSend: function (xhr) {
+              xhr.setRequestHeader('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIwZjlmMmQyN2JkMjE0NWNmYTkxNWMwOTNhYTMyZGQyMyIsImlhdCI6MTcxMTMwNjg3NSwiZXhwIjoyMDI2NjY2ODc1fQ._AgV0wV5xvjGXkuCaRWZmwOYSSJxFqVure6SJnJlzds');
+          },
+          data: {"state": card, "attributes": {}},
+        });
+        $.ajax({
+          url: "http://192.168.0.101:8123/api/states/input_text.id_card_stage",
+          type: 'POST',
+          beforeSend: function (xhr) {
+              xhr.setRequestHeader('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIwZjlmMmQyN2JkMjE0NWNmYTkxNWMwOTNhYTMyZGQyMyIsImlhdCI6MTcxMTMwNjg3NSwiZXhwIjoyMDI2NjY2ODc1fQ._AgV0wV5xvjGXkuCaRWZmwOYSSJxFqVure6SJnJlzds');
+          },
+          data: {"state": stage, "attributes": {}},
+        });
+        $.ajax({
+          url: "http://192.168.0.101:8123/api/states/input_text.id_card_solved",
+          type: 'POST',
+          beforeSend: function (xhr) {
+              xhr.setRequestHeader('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIwZjlmMmQyN2JkMjE0NWNmYTkxNWMwOTNhYTMyZGQyMyIsImlhdCI6MTcxMTMwNjg3NSwiZXhwIjoyMDI2NjY2ODc1fQ._AgV0wV5xvjGXkuCaRWZmwOYSSJxFqVure6SJnJlzds');
+          },
+          data: {"state": finished, "attributes": {}},
+        });
+      }
+
+      function arraysEqual(a, b) {
+        if (a === b) return true;
+        if (a == null || b == null) return false;
+        if (a.length !== b.length) return false;
+
+        for (var i = 0; i < a.length; ++i) {
+          if (a[i] !== b[i]) return false;
+        }
+        return true;
+      }
+
+      function set_instruction_styling(style) {
+        $("#instructions_container").removeClass("is-danger");
+        $("#instructions_container").removeClass("is-warning");
+        $("#instructions_container").removeClass("is-info");
+        $("#instructions_container").removeClass("is-success");
+        $("#instructions_container").addClass(style);
+      }
+
+      function get_instruction_text(item_num) {
+        if (item_num < 4) {
+          return "scan in order of last name."
+        }
+        if (item_num < 8) {
+          return "scan in order of most to fewest badges."
+        }
+        if (item_num < 12) {
+          return "scan in order of profile picture: Pokeball, Peace Sign, Pokedex, No hand."
+        }
+        return ""
+      }
+
+      function do_puzzle(last_item, scan_list) {
+        len = scan_list.length;
+        last_checkpoint = len - (len % 4);
+
+        if (correct_order[len] != last_item) {
+          scan_list = scan_list.slice(0,last_checkpoint);
+
+          send_state(trainers[last_item]["name"], last_checkpoint/4, false);
+
+          // Incorrect item scanned
+          $("#instructions").text("Error! Please re-" + get_instruction_text(len))
+          set_instruction_styling("is-danger");
+          return scan_list;
+
+          // if(last_item == correct_order[0]){
+          //   $("#instructions").text("Please continue in order of last name.");
+          //   set_instruction_styling("");
+          // }
+          // return [last_item];
+        }
+
+        // Correct item scanned, add it to list
+        scan_list.push(last_item);
+        len = scan_list.length
+        last_checkpoint = len - (len % 4);
+
+        send_state(trainers[last_item]["name"], last_checkpoint/4, false);
+
+        set_instruction_styling("");
+        $("#instructions").text("Continue to " + get_instruction_text(len))
+
+        if (len == 4)  {
+          $("#instructions").html("First condition met.<br>Please re-scan in order of most to fewest badges.")
+          set_instruction_styling("is-warning");
+          has_started_sequence = true;
+        } else if (len == 8)  {
+          $("#instructions").html("Second condition met.<br>Please re-scan in order of profile picture: Pokeball, Peace Sign, Pokedex, No hand.")
+          set_instruction_styling("is-info");
+        } else if (len == correct_order.length ) {
+          $("#instructions").text("Final condition met, opening secret compartment in ... 3")
+          setTimeout(() => {
+            $("#instructions").text("Final condition met, opening secret compartment in ... 3 ... 2")
+          }, 1000);
+          setTimeout(() => {
+            $("#instructions").text("Final condition met, opening secret compartment in ... 3 ... 2 ... 1")
+          }, 2000);
+          setTimeout(() => {
+            send_state(trainers[last_item]["name"], 3, true);
+          }, 3000);
+          set_instruction_styling("is-success");
+        }
+
+        if(has_started_sequence) {
+          $("#instructions_container").show()
+        }
+        return scan_list;
+      }
+
+      $(function() {
+        $('#card_input').on("keypress", function(e) {
+          if (e.keyCode == 13) {
+            text = $("#card_input").val().slice(1, -1);
+            $("#card_input").val("");
+            if(text in trainers){
+              show_trainer(trainers[text]);
+              scan_list = do_puzzle(text, scan_list);
+            }
+            return false;
+          }
+        });
+        setInterval(function () {$('#card_input').focus();}, 1000);
+      })
+    </script>
+  </head>
+  <body>
+    <section class="hero is-danger">
+      <div class="hero-body">
+        <p class="title">
+          Pokemon Trainer Lookup
+        </p>
+        <p class="subtitle">
+          Swipe a pokemon trainer card to start...
+        </p>
+      </div>
+    </section>
+    <section class="section">
+      <div class="container">
+        <div class="field">
+          <div class="control">
+            <input id="card_input" class="input" type="text" placeholder="Scan Card">
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="section py-0" id="trainer_info" style="display:none;" >
+      <div class="container">
+        <div class="box">
+          <div class="columns">
+            <div class="column is-half">
+              <div class="block is-size-3">
+                <b id="name"></b>
+              </div>
+              <div class="block is-size-5">
+                <b>Date of Birth:</b> <span id="dob"></span>
+              </div>
+              <div class="block is-size-5">
+                <b>Pokemon Trainer #:</b> <span id="ptn"></span>
+              </div>
+              <div class="block is-size-5">
+                <b>Last Gym Visited:</b> <span id="gym"></span>
+              </div>
+              <div class="block is-size-5">
+                <b>Primary Type:</b> <span id=ptype></span>
+              </div>
+              <div class="block is-size-5">
+                <b>Badges:</b>
+                <div class=level>
+                  <div class="level-left" id="badges">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="column is-half">
+              <img id="trainer_img" style="width: 400px;" src="cascadebadge.webp">
+            </div>
+          </div>
+        </div>
+        <article style="display:none;" class="message is-danger" id="instructions_container">
+          <div class="message-header">
+          </div>
+          <div id="instructions" class="message-body has-text-centered is-size-4 py-2"></div>
+        </article>
+      </div>
+    </section>
+  </body>
+</html>
