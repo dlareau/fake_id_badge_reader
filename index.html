@@ -88,26 +88,29 @@
         $.ajax({
           url: "http://192.168.0.101:8123/api/states/input_text.id_card_last_scanned",
           type: 'POST',
+          contentType: "application/json",
           beforeSend: function (xhr) {
               xhr.setRequestHeader('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIwZjlmMmQyN2JkMjE0NWNmYTkxNWMwOTNhYTMyZGQyMyIsImlhdCI6MTcxMTMwNjg3NSwiZXhwIjoyMDI2NjY2ODc1fQ._AgV0wV5xvjGXkuCaRWZmwOYSSJxFqVure6SJnJlzds');
           },
-          data: {"state": card, "attributes": {}},
+          data: JSON.stringify({"state": card, "attributes": {}}),
         });
         $.ajax({
           url: "http://192.168.0.101:8123/api/states/input_text.id_card_stage",
           type: 'POST',
+          contentType: "application/json",
           beforeSend: function (xhr) {
               xhr.setRequestHeader('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIwZjlmMmQyN2JkMjE0NWNmYTkxNWMwOTNhYTMyZGQyMyIsImlhdCI6MTcxMTMwNjg3NSwiZXhwIjoyMDI2NjY2ODc1fQ._AgV0wV5xvjGXkuCaRWZmwOYSSJxFqVure6SJnJlzds');
           },
-          data: {"state": stage, "attributes": {}},
+          data: JSON.stringify({"state": stage, "attributes": {}}),
         });
         $.ajax({
           url: "http://192.168.0.101:8123/api/states/input_text.id_card_solved",
           type: 'POST',
+          contentType: "application/json",
           beforeSend: function (xhr) {
               xhr.setRequestHeader('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIwZjlmMmQyN2JkMjE0NWNmYTkxNWMwOTNhYTMyZGQyMyIsImlhdCI6MTcxMTMwNjg3NSwiZXhwIjoyMDI2NjY2ODc1fQ._AgV0wV5xvjGXkuCaRWZmwOYSSJxFqVure6SJnJlzds');
           },
-          data: {"state": finished, "attributes": {}},
+          data: JSON.stringify({"state": finished, "attributes": {}}),
         });
       }
 
