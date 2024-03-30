@@ -16,6 +16,7 @@
           "gym": "Cerulean City Gym",
           "ptype": "Water",
           "badges": ["earth"],
+          // Pokeball
         },
         "43148762": {
           "name": "Avery Phelps",
@@ -24,6 +25,7 @@
           "gym": "Vermillion City Gym",
           "ptype": "Grass",
           "badges": ["boulder", "cascade", "thunder"],
+          // Pokedex
         },
         "36474933": {
           "name": "Ashton Baxter",
@@ -32,6 +34,7 @@
           "gym": "Fuchsia City Gym",
           "ptype": "Electric",
           "badges": ["rainbow", "marsh"],
+          // Peace sign
         },
         "63971389": {
           "name": "Taylor Ingram",
@@ -40,6 +43,7 @@
           "gym": "Cinnabar Island Gym",
           "ptype": "Psychic",
           "badges": ["soul", "volcano", "boulder", "earth"],
+          // No hand
         },
         "": {
           "name": "",
@@ -63,10 +67,11 @@
         "43148762",
         "36474933",
         "24811349",
+
         // Fix order after this point
-        "24811349",
-        "36474933",
         "43148762",
+        "36474933",
+        "24811349",
         "63971389"
       ];
 
@@ -141,7 +146,7 @@
           return "scan in order of most to fewest badges."
         }
         if (item_num < 12) {
-          return "scan in order of profile picture: Pokeball, Peace Sign, Pokedex, No hand."
+          return "scan in order of profile picture: Pokedex, Peace Sign, Pokeball, No hand."
         }
         return ""
       }
