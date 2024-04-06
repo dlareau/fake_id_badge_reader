@@ -91,7 +91,7 @@
 
       function send_state(card, stage, finished) {
         $.ajax({
-          url: "http://192.168.0.101:8123/api/states/input_text.id_card_last_scanned",
+          url: "http://192.168.2.1:8123/api/states/input_text.id_card_last_scanned",
           type: 'POST',
           contentType: "application/json",
           beforeSend: function (xhr) {
@@ -100,7 +100,7 @@
           data: JSON.stringify({"state": card, "attributes": {}}),
         });
         $.ajax({
-          url: "http://192.168.0.101:8123/api/states/input_text.id_card_stage",
+          url: "http://192.168.1.1:8123/api/states/input_text.id_card_stage",
           type: 'POST',
           contentType: "application/json",
           beforeSend: function (xhr) {
@@ -109,7 +109,7 @@
           data: JSON.stringify({"state": stage, "attributes": {}}),
         });
         $.ajax({
-          url: "http://192.168.0.101:8123/api/states/input_text.id_card_solved",
+          url: "http://192.168.2.1:8123/api/states/input_text.id_card_solved",
           type: 'POST',
           contentType: "application/json",
           beforeSend: function (xhr) {
